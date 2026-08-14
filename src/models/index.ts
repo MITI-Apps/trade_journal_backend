@@ -1,7 +1,9 @@
 import  User  from './User.js';
 import TradingAccounts from './TradingAccount.js'
 import Trade from './Trades.js';
+import TradeScreenshots from './TradeScreenshot.js'
 
+// User -> TradingAccount (1:N)
 User.hasMany(TradingAccounts, {
     foreignKey: 'userId',
     as: 'tradingAccounts',
@@ -13,6 +15,7 @@ TradingAccounts.belongsTo(User, {
     as: 'user',
 });
 
+// TradingAccount -> Trade (1:N)
 TradingAccounts.hasMany(Trade, {
     foreignKey: 'tradingAccountId',
     as: 'trades',
@@ -24,4 +27,16 @@ Trade.belongsTo(TradingAccounts, {
     as: 'tradingAccount',
 });
 
-export { User, TradingAccounts, Trade };
+// Trade -> TradeScreenshots (1:N)
+Trade.hasMany(TradeScreenshots, {
+    foreignKey: 'tradeId',
+    as: 'screenshots',
+    onDelete: 'CASCADE'
+});
+
+TradeScreenshots.belongsTo(Trade, {
+    foreignKey: 'tradeId',
+    as: 'trade',
+});
+
+export { User, TradingAccounts, Trade, TradeScreenshots };

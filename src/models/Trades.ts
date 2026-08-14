@@ -1,7 +1,24 @@
 import { Model, DataTypes } from 'sequelize';
 import  sequelize  from '../database/connection.js';
 
-class Trade extends Model {}
+type TradeDirection = 'BUY' | 'SELL';
+type TradeOutcome = 'WIN' | 'LOSS' | 'BREAK_EVEN' | 'OPEN';
+
+class Trade extends Model {
+    declare id: string;
+    declare tradingAccountId: string;
+    declare symbol: string;
+    declare direction: TradeDirection;
+    declare confluence: string | null;
+    declare outcome: TradeOutcome;
+    declare pnl: number;
+    declare openedAt: Date;
+    declare closedAt: Date | null;
+    declare notes: string | null;
+    
+    declare readonly createdAt: Date;
+    declare readonly updatedAt: Date;
+}
 
 
 Trade.init(
