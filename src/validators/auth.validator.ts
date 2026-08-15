@@ -17,4 +17,15 @@ const createUserSchema = Joi.object({
   }),
 });
 
-export {createUserSchema};
+// Login Schema
+const loginUserSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    'any.required': 'Email is required',
+    'string.email': 'Please provide a valid email',
+  }),
+  password: Joi.string().required().messages({
+    'any.required': 'Password is required',
+  }),
+});
+
+export {createUserSchema, loginUserSchema};
