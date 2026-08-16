@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import authRoutes from "./routes/auth.routes.js"
+import "./models/index.js"
 
 const app = express();
 

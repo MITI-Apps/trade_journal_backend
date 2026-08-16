@@ -3,6 +3,13 @@ import bcrypt from 'bcrypt';
 import User from "../models/User.js";
 import jwt from 'jsonwebtoken';
 
+// Extend the Express Request type so TypeScript recognizes req.auth
+interface AuthenticatedRequest extends Request {
+  auth?: {
+    userId: string;
+  };
+}
+
 const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
@@ -29,6 +36,7 @@ const registerUser = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Failed to register user' });
   }
 };
@@ -47,7 +55,7 @@ const loginUser = async (req: Request, res: Response) => {
     }
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret){
-      return res.status(404).json({ error: 'JWT secret not found' });
+      return res.status(500).json({ error: 'JWT secret not found' });
     }
     const token = jwt.sign(
       {userId: user.id, email: user.email },
@@ -57,8 +65,27 @@ const loginUser = async (req: Request, res: Response) => {
     
     res.status(200).json({ message: 'Login successful', token});
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Failed to login' });
   }
 };
 
-export { registerUser, loginUser };
+const getMe = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.auth?.userId
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password']}
+    });
+
+    if (!user){
+      return res.status(404).json({ error: 'User not found' })
+    };
+
+    return res.status(200).json({  user });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch user profile'})
+  }
+};
+
+export { registerUser, loginUser, getMe };
