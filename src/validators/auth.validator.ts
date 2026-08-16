@@ -28,4 +28,28 @@ const loginUserSchema = Joi.object({
   }),
 });
 
-export {createUserSchema, loginUserSchema};
+const updateProfileSchema = Joi.object({
+  name: Joi.string().min(3).max(30).required().messages({
+    'any.required': 'Name is required',
+    'string.empty': 'Name cannot be empty',
+    'string.min': 'Name must be at least 3 characters long',
+    'string.max': 'Name cannot exceed 30 characters',
+  }),
+  email: Joi.string().email().required().messages({
+    'any.required': 'Email is required',
+    'string.email': 'Please provide a valid email',
+  }),
+});
+
+// Change Password Schema
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().required().messages({
+    'any.required': 'Current password is required',
+  }),
+  newPassword: Joi.string().min(6).required().messages({
+    'any.required': 'New password is required',
+    'string.min': 'New password must be at least 6 characters',
+  }),
+});
+
+export {createUserSchema, loginUserSchema, updateProfileSchema, changePasswordSchema};

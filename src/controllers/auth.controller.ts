@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import bcrypt from 'bcrypt';
 import User from "../models/User.js";
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
 // Extend the Express Request type so TypeScript recognizes req.auth
 interface AuthenticatedRequest extends Request {
@@ -88,4 +89,45 @@ const getMe = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export { registerUser, loginUser, getMe };
+const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
+  try{
+    const { name, email } = req.body
+    const userId = req.auth?.userId
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    const existingUser = await User.findOne({
+      where: {
+        email, 
+        id: { [Op.ne]: userId} // to exclude current user 
+      }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email is already in use by another account' });
+    };
+    
+    //update fields
+    user.name = name;
+    user.email = email;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        updatedAt: user.updatedAt,
+      },
+    });
+
+  }catch (error){
+    res.status(500).json({ error: 'Failed to update profile' })
+  }
+};
+
+export { registerUser, loginUser, getMe, updateProfile };
