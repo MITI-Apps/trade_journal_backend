@@ -4,12 +4,6 @@ import User from "../models/User.js";
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 
-// Extend the Express Request type so TypeScript recognizes req.auth
-interface AuthenticatedRequest extends Request {
-  auth?: {
-    userId: string;
-  };
-}
 
 const registerUser = async (req: Request, res: Response) => {
   try {
@@ -71,7 +65,7 @@ const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-const getMe = async (req: AuthenticatedRequest, res: Response) => {
+const getMe = async (req: Request, res: Response) => {
   try {
     const userId = req.auth?.userId
     const user = await User.findByPk(userId, {
@@ -89,7 +83,7 @@ const getMe = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
+const updateProfile = async (req: Request, res: Response) => {
   try{
     const { name, email } = req.body
     const userId = req.auth?.userId
@@ -130,4 +124,29 @@ const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export { registerUser, loginUser, getMe, updateProfile };
+const changePassword = async (req: Request, res: Response) => {
+  try{
+    const userId = req.auth?.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch){
+      return res.status(401).json({ error: 'Incorrect current password' });
+    }
+
+    const password = await bcrypt.hash(newPassword, 10);
+    user.password = password;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error){
+    res.status(500).json({ error: "Failed to change password"})
+  }
+}
+
+export { registerUser, loginUser, getMe, updateProfile, changePassword };
