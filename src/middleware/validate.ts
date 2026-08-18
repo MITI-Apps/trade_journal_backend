@@ -15,4 +15,16 @@ function validate(schema: ObjectSchema){
     }
 };
 
-export default validate;
+// Validation middleware for URL params
+const validateParams = (schema: ObjectSchema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.params);
+    if (error) {
+      const messages = error.details.map((deta) => deta.message)
+      return res.status(400).json({ errors: messages });
+    }
+    next();
+  };
+};
+
+export  { validate, validateParams};
