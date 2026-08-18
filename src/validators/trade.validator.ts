@@ -42,3 +42,16 @@ export const tradeIdParamSchema = Joi.object({
     'any.required': 'Trade ID is required',
   }),
 });
+
+export const updateTradeSchema = Joi.object({
+  symbol: Joi.string().trim().uppercase().optional(),
+  direction: Joi.string().valid('BUY', 'SELL').optional(),
+  confluence: Joi.string().max(2000).optional().allow('', null),
+  outcome: Joi.string().valid('WIN', 'LOSS', 'BREAK_EVEN', 'OPEN').optional(),
+  pnl: Joi.number().optional(),
+  openedAt: Joi.date().iso().optional(),
+  closedAt: Joi.date().iso().optional().allow(null),
+  notes: Joi.string().max(1000).optional().allow('', null),
+}).min(1).messages({
+  'object.min': 'You must provide at least one field to update',
+});

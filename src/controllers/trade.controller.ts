@@ -125,3 +125,79 @@ export const getTradeById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch trade' });
   }
 };
+
+// Update & Close Trade
+export const updateTrade = async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth?.userId;
+    const { id } = req.params;
+    const updates = req.body;
+
+    // 1. Ownership & Existence Guard (via associated TradingAccount)
+    const trade = await Trade.findOne({
+      where: { id },
+      include: [
+        {
+          model: TradingAccount,
+          as: 'tradingAccount',
+          where: { userId },
+        },
+      ],
+    });
+
+    if (!trade) {
+      return res.status(404).json({ error: 'Trade not found or access denied' });
+    }
+
+    // 2. Business Logic: Handle Outcome & Timestamp State Transitions
+    if (updates.outcome) {
+      if (updates.outcome === 'OPEN') {
+        // Re-opening trade: reset closedAt and PnL
+        updates.closedAt = null;
+        updates.pnl = 0.0;
+      } else if (trade.outcome === 'OPEN' && !updates.closedAt) {
+        // Closing an OPEN trade without explicit closedAt timestamp: default to now
+        updates.closedAt = new Date();
+      }
+    }
+
+    // 3. Apply updates and save
+    await trade.update(updates);
+
+    res.status(200).json({
+      message: 'Trade updated successfully',
+      trade,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update trade' });
+  }
+};
+
+// Delete Trade
+export const deleteTrade = async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth?.userId;
+    const { id } = req.params;
+
+    const trade = await Trade.findOne({
+      where: { id },
+      include: [
+        {
+          model: TradingAccount,
+          as: 'tradingAccount',
+          where: { userId },
+        },
+      ],
+    });
+
+    if (!trade) {
+      return res.status(404).json({ error: 'Trade not found or access denied' });
+    }
+
+    await trade.destroy();
+
+    res.status(200).json({ message: 'Trade deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete trade' });
+  }
+};
