@@ -27,4 +27,17 @@ const validateParams = (schema: ObjectSchema) => {
   };
 };
 
+// Query validation middleware
+export const validateQuery = (schema: ObjectSchema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.query, { stripUnknown: true });
+    if (error) {
+      const messages = error.details.map((deta) => deta.message)
+      return res.status(400).json({ errors: messages });
+    }
+    Object.defineProperty(req, 'query', { value, writable: true, configurable: true });
+    next();
+  };
+};
+
 export  { validate, validateParams};
