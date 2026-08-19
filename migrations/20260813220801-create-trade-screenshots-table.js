@@ -25,6 +25,10 @@ export default{
         allowNull: false,
         defaultValue: 'BEFORE',
       },
+      caption: {
+        type: Sequelize.STRING(255),
+        allowNull: true, // e.g., "H4 Setup", "M15 Entry", "Exit Chart"
+      },
       url: {
         type: Sequelize.STRING(500),
         allowNull: false,
