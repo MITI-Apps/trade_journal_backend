@@ -70,8 +70,8 @@ export const getTrades = async (req: Request, res: Response) => {
     // 2. Fetch trades belonging strictly to THIS validated account
     const offset = (Number(page) - 1) * Number(limit);
     const whereClause: Record<string, any> = {
-      tradingAccountId, // Scope trades ONLY to this account
-    };
+      tradingAccountId: tradingAccountId, // Scope trades ONLY to this account
+    };// where the trade, belongs to the current(opened) trading account
 
     if (symbol) whereClause.symbol = symbol;
     if (direction) whereClause.direction = direction;
