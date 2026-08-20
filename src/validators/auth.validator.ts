@@ -29,16 +29,16 @@ const loginUserSchema = Joi.object({
 });
 
 const updateProfileSchema = Joi.object({
-  name: Joi.string().min(3).max(30).required().messages({
-    'any.required': 'Name is required',
+  name: Joi.string().min(3).max(30).optional().messages({
     'string.empty': 'Name cannot be empty',
     'string.min': 'Name must be at least 3 characters long',
     'string.max': 'Name cannot exceed 30 characters',
   }),
-  email: Joi.string().email().required().messages({
-    'any.required': 'Email is required',
+  email: Joi.string().email().optional().messages({
     'string.email': 'Please provide a valid email',
   }),
+}).min(1).messages({
+  'object.min': 'Please provide at least one field to update',
 });
 
 // Change Password Schema

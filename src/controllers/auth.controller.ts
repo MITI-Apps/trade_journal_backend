@@ -90,13 +90,13 @@ const updateProfile = async (req: Request, res: Response) => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" })
+      return res.status(404).json({ error: "User not found" });
     }
 
     const existingUser = await User.findOne({
       where: {
         email, 
-        id: { [Op.ne]: userId} // to exclude current user 
+        id: { [Op.ne]: userId}
       }
     });
 
@@ -131,7 +131,7 @@ const changePassword = async (req: Request, res: Response) => {
 
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ error: "User not found" })
+      return res.status(404).json({ error: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);

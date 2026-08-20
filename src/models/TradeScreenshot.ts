@@ -7,6 +7,7 @@ class TradeScreenshots extends Model {
     declare id: string;
     declare tradeId: string;
     declare screenshotType: ScreenshotType;
+    declare caption: string | null;
     declare url: string;
     declare publicId: string;
 

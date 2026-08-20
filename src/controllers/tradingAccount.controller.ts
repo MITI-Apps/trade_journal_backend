@@ -2,8 +2,7 @@ import type { Request, Response } from 'express';
 import  TradingAccount  from '../models/TradingAccount.js';
 import { Op } from 'sequelize';
 
-
-const createTradingAccount = async (req: Request, res: Response) => {
+export const createTradingAccount = async (req: Request, res: Response) => {
   try {
     const userId = req.auth?.userId;
     const { accountName, market, accountType, startingBalance, currency } = req.body;
@@ -36,7 +35,7 @@ const createTradingAccount = async (req: Request, res: Response) => {
 };
 
 // Fetch All Trading Accounts Belonging to Authenticated User
-const getAllTradingAccounts = async (req: Request, res: Response) => {
+export const getAllTradingAccounts = async (req: Request, res: Response) => {
   try {
     const userId = req.auth?.userId;
 
@@ -55,7 +54,7 @@ const getAllTradingAccounts = async (req: Request, res: Response) => {
 };
 
 // Fetch Single Trading Account by ID (Ensuring Ownership)
-const getTradingAccountById = async (req: Request, res: Response) => {
+export const getTradingAccountById = async (req: Request, res: Response) => {
   try {
     const userId = req.auth?.userId;
     const { id } = req.params;
@@ -142,5 +141,3 @@ export const deleteTradingAccount = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete trading account' });
   }
 };
-
-export { createTradingAccount, getAllTradingAccounts, getTradingAccountById };
